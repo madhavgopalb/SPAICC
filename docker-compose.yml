@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: saicc-postgres
+    environment:
+      POSTGRES_USER: saicc
+      POSTGRES_PASSWORD: saicc
+      POSTGRES_DB: saicc
+    ports:
+      - "5432:5432"
+    volumes:
+      - saicc-postgres:/var/lib/postgresql/data
+volumes:
+  saicc-postgres:

@@ -1,0 +1,182 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  EXECUTIVE
+  SECURITY
+  PLATFORM_ADMIN
+  FINANCE
+  DEPARTMENT_HEAD
+}
+
+enum ToolStatus {
+  APPROVED
+  BLOCKED
+  UNDER_REVIEW
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum AlertStatus {
+  OPEN
+  TRIAGED
+  CONVERTED
+  DISMISSED
+}
+
+enum IncidentStatus {
+  OPEN
+  ASSIGNED
+  RESOLVED
+}
+
+enum AgentStatus {
+  HEALTHY
+  DEGRADED
+  DOWN
+}
+
+model Tenant {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  users     User[]
+  tools     AiTool[]
+  events    AiUsageEvent[]
+  alerts    SecurityAlert[]
+  incidents Incident[]
+  agents    AiAgent[]
+  costs     CostRecord[]
+  auditLogs AuditLog[]
+}
+
+model User {
+  id           String   @id @default(cuid())
+  tenantId     String
+  email        String   @unique
+  name         String
+  role         Role
+  department   String
+  passwordHash String
+  createdAt    DateTime @default(now())
+  tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  sessions     Session[]
+  auditLogs    AuditLog[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AiTool {
+  id          String     @id @default(cuid())
+  tenantId    String
+  name        String
+  provider    String
+  category    String
+  status      ToolStatus
+  ownerTeam   String
+  monthlyCost Float
+  riskNotes   String
+  updatedAt   DateTime   @updatedAt
+  tenant      Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  events      AiUsageEvent[]
+}
+
+model AiUsageEvent {
+  id                String    @id @default(cuid())
+  tenantId          String
+  toolId            String?
+  userEmail         String
+  department        String
+  provider          String
+  eventType         String
+  promptCategory    String
+  riskLevel         RiskLevel
+  tokens            Int
+  estimatedCost     Float
+  containsSensitive Boolean
+  occurredAt        DateTime
+  tenant            Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tool              AiTool?   @relation(fields: [toolId], references: [id], onDelete: SetNull)
+}
+
+model SecurityAlert {
+  id          String      @id @default(cuid())
+  tenantId    String
+  title       String
+  description String
+  source      String
+  riskLevel   RiskLevel
+  status      AlertStatus @default(OPEN)
+  createdAt   DateTime    @default(now())
+  tenant      Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  incident    Incident?
+}
+
+model Incident {
+  id          String         @id @default(cuid())
+  tenantId    String
+  alertId     String?        @unique
+  title       String
+  owner       String
+  status      IncidentStatus @default(OPEN)
+  createdAt   DateTime       @default(now())
+  resolvedAt  DateTime?
+  tenant      Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  alert       SecurityAlert? @relation(fields: [alertId], references: [id], onDelete: SetNull)
+}
+
+model AiAgent {
+  id          String      @id @default(cuid())
+  tenantId    String
+  name        String
+  ownerTeam   String
+  status      AgentStatus
+  lastRunAt   DateTime
+  successRate Float
+  latencyMs   Int
+  tenant      Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model CostRecord {
+  id         String   @id @default(cuid())
+  tenantId   String
+  provider   String
+  department String
+  month      String
+  spend      Float
+  licenses   Int
+  inactive   Int
+  tenant     Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  tenantId  String
+  actorId   String?
+  action    String
+  entity    String
+  entityId  String
+  metadata  Json
+  createdAt DateTime @default(now())
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  actor     User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+}
