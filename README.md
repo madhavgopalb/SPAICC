@@ -19,31 +19,40 @@ SprintPark AI Command Center, shortened as SAICC, is a multi-tenant enterprise A
 
 ## Local Setup
 
-1. Copy `.env.example` to `.env`.
-2. Start PostgreSQL with Docker Compose:
+1. Run the SAICC setup workflow:
 
 ```bash
-docker compose up -d
+npm run dev:setup
 ```
 
-3. Install dependencies:
+2. Start the app:
+
+```bash
+npm run dev:start
+```
+
+3. Open:
+
+http://localhost:3000/login
+
+Docker Desktop must be running and the `docker` command must be available on PATH.
+
+## Manual Setup
 
 ```bash
 npm install
-```
-
-4. Run migrations and seed data:
-
-```bash
-npm run db:migrate
+docker compose up -d
+npm run db:generate
+npm run db:deploy
 npm run db:seed
+npm run dev:start
 ```
 
-5. Start the app:
+The local database uses:
 
-```bash
-npm run dev
-```
+- Database: `saicc`
+- Username: `saicc`
+- Port: `5432`
 
 ## Demo Credentials
 

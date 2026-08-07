@@ -4,13 +4,17 @@
   "private": true,
   "description": "SprintPark AI Command Center (SAICC) - multi-tenant AI governance command center.",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -H 0.0.0.0 -p 3000",
+    "dev:setup": "node scripts/saicc-dev.mjs setup",
+    "dev:start": "next dev -H 0.0.0.0 -p 3000",
+    "doctor": "node scripts/saicc-dev.mjs doctor",
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
     "test": "vitest run"
   },
