@@ -11,7 +11,7 @@ export default function LoginPage() {
           </div>
           <div>
             <h1 className="text-xl font-semibold tracking-normal">SprintPark AI Command Center</h1>
-            <p className="text-sm text-stone-500">SAICC Milestone 1 vertical slice</p>
+            <p className="text-sm text-stone-500">SPAICC Milestone 1 vertical slice</p>
           </div>
         </div>
         <LoginForm />

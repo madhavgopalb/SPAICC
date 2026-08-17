@@ -1,66 +1,39 @@
-# SprintPark AI Command Center (SAICC)
+# SPAICC - SprintPark AI Command Center
 
-SprintPark AI Command Center, shortened as SAICC, is a multi-tenant enterprise AI governance and operations platform. This repository starts with Milestone 1: a runnable vertical slice that demonstrates the command center without waiting for live external AI platform integrations.
+SPAICC is the SprintPark AI Command Center: a multi-tenant enterprise AI governance and operations platform for visibility, security monitoring, tool governance, agent health, cost analytics, and auditability.
 
-## Milestone 1 Included
+This repository contains Milestone 1: a runnable vertical slice with database-backed dashboards, synthetic AI usage events, security alerts, incident workflow, AI tools registry, agent health, costs, audit logs, demo login, and role-based navigation.
 
-- Demo login with role-based navigation
-- Seeded SprintPark Industries tenant
-- Executive AI dashboard with PostgreSQL-backed KPIs
-- Live command center with synthetic AI usage events
-- AI usage event filters
-- Security alerts that can be converted into incidents
-- Incident resolution workflow
-- AI tools registry with approve, block, and under-review actions
-- AI agent health page
-- Cost and license overview
-- Audit logs for sensitive governance actions
-- Prisma service layer for tenant-aware reads and writes
+GitHub repository: https://github.com/madhavgopalb/SPAICC
+
+## Stack
+
+- Next.js App Router
+- React and TypeScript
+- Tailwind CSS
+- Prisma
+- PostgreSQL
+- Netlify deployment target
 
 ## Local Setup
 
-1. Run the SAICC setup workflow:
-
-```bash
-npm run dev:setup
-```
-
-2. Start the app:
-
-```bash
-npm run dev:start
-```
-
-3. Open:
-
-http://localhost:3000/login
-
 Docker Desktop must be running and the `docker` command must be available on PATH.
-
-## Manual Setup
 
 ```bash
 npm install
-docker compose up -d
-npm run db:generate
-npm run db:deploy
-npm run db:seed
+npm run dev:setup
 npm run dev:start
 ```
 
-The local database uses:
-
-- Database: `saicc`
-- Username: `saicc`
-- Port: `5432`
-
-## Demo Credentials
-
-All demo users use this password:
+Open:
 
 ```text
-SprintPark!2026
+http://localhost:3000/login
 ```
+
+## Local Demo Users
+
+Local seed data creates development-only demo users for the seeded SprintPark tenant:
 
 - `admin@saicc.local` - Platform Admin
 - `executive@saicc.local` - Executive
@@ -68,18 +41,105 @@ SprintPark!2026
 - `finance@saicc.local` - Finance
 - `department@saicc.local` - Department Head
 
-## Validation Commands
+The shared local demo password is used only for development seed data. Do not seed demo accounts into production unless explicitly intended.
+
+## Environment Variables
+
+Create `.env` locally from `.env.example`. Do not commit real values.
+
+Required:
+
+- `DATABASE_URL` - PostgreSQL connection string
+- `SAICC_SESSION_SECRET` - long random session secret
+
+Recommended for production:
+
+- `DIRECT_URL` - direct PostgreSQL URL for migrations when the provider requires one
+- `APP_URL` - production base URL, for example `https://spaicc.com`
+
+Local Docker-only:
+
+- `SAICC_DB_PORT` - host port for local PostgreSQL, defaults to `5432`
+
+## Database
+
+Local development uses PostgreSQL through Docker Compose.
+
+Production must use managed PostgreSQL such as Neon, Supabase PostgreSQL, AWS RDS PostgreSQL, or Azure Database for PostgreSQL. Do not use `localhost:5432` in Netlify production.
+
+Generate Prisma Client:
 
 ```bash
+npm run db:generate
+```
+
+Apply production migrations:
+
+```bash
+npm run db:deploy
+```
+
+Local development seeding:
+
+```bash
+npm run db:seed
+```
+
+## Netlify Deployment
+
+Netlify should build from GitHub repository `madhavgopalb/SPAICC` on branch `main`.
+
+Build command:
+
+```bash
+npm run build
+```
+
+Node version is pinned in `netlify.toml`:
+
+```text
+20
+```
+
+Configure production environment variables in Netlify, not in source code:
+
+- `DATABASE_URL`
+- `DIRECT_URL` if required by the database provider
+- `SAICC_SESSION_SECRET`
+- `APP_URL`
+
+After `DATABASE_URL` is configured, run production migrations with `npm run db:deploy` or Netlify's configured migration workflow. Never run `prisma migrate dev` against production.
+
+## Health Check
+
+SPAICC exposes:
+
+```text
+/api/health
+```
+
+It returns `200` when the database is reachable and `503` when the database is unavailable. It does not expose credentials.
+
+## Validation
+
+```bash
+npm run lint
 npm run typecheck
 npm run test
 npm run build
 ```
 
+## Safe Troubleshooting
+
+- If `npm run doctor` reports Docker missing, install/start Docker Desktop and ensure `docker` is on PATH.
+- If PostgreSQL port `5432` is already used locally, set `SAICC_DB_PORT` in `.env` and update `DATABASE_URL` to match.
+- If Netlify deployment fails with Prisma connectivity errors, verify production `DATABASE_URL` is a managed PostgreSQL URL with SSL enabled where required.
+- If authentication fails in production, verify `SAICC_SESSION_SECRET` and `APP_URL` are configured in Netlify.
+
 ## Privacy Position
 
-SAICC Milestone 1 stores metadata, risk classifications, costs, tool status, incidents, and audit records. It does not store full prompt content by default.
+SPAICC Milestone 1 stores metadata, risk classifications, costs, tool status, incidents, and audit records. It does not store full prompt content by default.
 
 ## Next Phase
 
-Recommended Milestone 2: policy creation/versioning, recommendations with supporting metrics, scheduled executive reports, CSV import, and generic webhook ingestion.
+Recommended Milestone 2: policy creation/versioning, recommendations with supporting metrics, scheduled executive reports, CSV import, generic webhook ingestion, and managed production database provisioning.

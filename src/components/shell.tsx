@@ -20,7 +20,7 @@ export function AppShell({
           </div>
           <div>
             <p className="text-sm font-semibold leading-5">SprintPark AI Command Center</p>
-            <p className="text-xs text-stone-500">SAICC</p>
+            <p className="text-xs text-stone-500">SPAICC</p>
           </div>
         </div>
         <nav className="mt-8 space-y-1">

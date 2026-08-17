@@ -14,7 +14,7 @@ export function LoginForm() {
       </label>
       <label className="block">
         <span className="text-sm font-medium text-stone-700">Password</span>
-        <input className="focus-ring mt-1 w-full rounded border border-stone-300 px-3 py-2" name="password" type="password" defaultValue="SprintPark!2026" />
+        <input className="focus-ring mt-1 w-full rounded border border-stone-300 px-3 py-2" name="password" type="password" autoComplete="current-password" />
       </label>
       {error ? <p className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</p> : null}
       <button className="focus-ring w-full rounded bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-cyan-800" disabled={pending}>
