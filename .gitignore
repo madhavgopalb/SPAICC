@@ -10,5 +10,6 @@ netlify
 .netlify
 coverage
 dist
+work
 *.log
 tsconfig.tsbuildinfo
